@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.io.*;
 
+
 enum Situatie{
     achizitionat,
     expus,
@@ -36,9 +37,22 @@ class Echipament{
         this.zona_mag=zona_mag;
         this.situatie=situatie;
     }
+
+    // Getter
+    public String getDenumire() {
+        return denumire;
+    }
+
+    public Situatie getSituatie(){
+        return situatie;
+    }
+    // Setter
+    public void setSituatie(Situatie NewSituatie) {
+        this.situatie = NewSituatie;
+    }
     @Override
     public String toString(){
-        return "Denumire"+denumire+", Numar de inventar:"+nr_inv+", Pret:"+pret+", Zona din magazin:"+zona_mag+ ", Situatie:"+situatie.toString();
+        return "Denumire:"+denumire+", Numar de inventar:"+nr_inv+", Pret:"+pret+", Zona din magazin:"+zona_mag+ ", Situatie:"+situatie.toString();
     }
 }
 
@@ -56,6 +70,13 @@ class Imprimante extends Echipament{
         this.p_car=p_car;
         this.mod_tiparire=mod_tiparire;
     }
+    public void setModTiparire(Mod_tiparire newModTiparire) {
+        this.mod_tiparire= newModTiparire;
+    }
+    @Override
+    public String toString() {
+        return super.toString()+", Pagini/minut:"+ppm + ",Rezolutie:" + rezolutie+" ,Pagini/cartus:"+p_car+", Mod tiparire:"+mod_tiparire.toString();
+    }
 
 
 }
@@ -69,6 +90,9 @@ class Copiatoare extends Echipament{
         super(denumire, nr_inv, pret, zona_mag, situatie);
         this.p_ton=p_ton;
         this.format_copiere=format_copiere;
+    }
+    public void setFormat_copiere(Format_copiere NewFormatCopiere) {
+        this.format_copiere= NewFormatCopiere;
     }
     @Override
     public String toString() {
@@ -90,6 +114,9 @@ class Sisteme_de_calcul extends Echipament{
         this.c_hdd=c_hdd;
         this.so=so;
     }
+    public void setSistemOperare(Sisteme_de_operare NewSO) {
+        this.so = NewSO;
+    }
     @Override
     public String toString() {
         return super.toString()+", Tip monitor:"+ tip_mon+ ", Viteza procesorului: " + vit_proc+", Capacitatea Hdd:"+c_hdd+ ", Sistem de operare:"+so.toString();
@@ -99,6 +126,7 @@ class Sisteme_de_calcul extends Echipament{
 public class Tema {
     public static void main(String[] args) throws IOException {
         List <Echipament> lista_echipamente= new ArrayList<>();
+
         String fFileName= "echipamente.txt";
         Scanner fileReader= new Scanner(new File(fFileName));
         while (fileReader.hasNext()) {
@@ -120,7 +148,8 @@ public class Tema {
 
 
         }
-
+        int setat=0;
+        String cautareDenumire;
         System.out.println("Alegeti optiunea dorita:");
         System.out.println("1 - Afişarea tuturor echipamentelor");
         System.out.println("2 - Afişarea imprimantelor");
@@ -136,32 +165,113 @@ public class Tema {
         Scanner scanner=new Scanner(System.in);
         int optiune = Integer.parseInt(scanner.nextLine());
         switch (optiune) {
-            case 1:
+            case 1: //Afişarea tuturor echipamentelor
                 for(Echipament ec:lista_echipamente){
                     System.out.println(ec);
                 }
                 break;
-            case 2:
+            case 2://Afişarea imprimantelor
                 for(Echipament ec:lista_echipamente){
                     if (ec instanceof Imprimante)
                         System.out.println(ec);
                 }
 
                 break;
-            case 3:
+            case 3://Afişarea copiatoarelor
+                for(Echipament ec:lista_echipamente){
+                    if (ec instanceof Copiatoare)
+                        System.out.println(ec);
+                }
+                break;
+            case 4://Afişarea sistemelor de calcul
+                for(Echipament ec:lista_echipamente){
+                    if (ec instanceof Sisteme_de_calcul)
+                        System.out.println(ec);
+                }
+                break;
+            case 5://Modificarea stării în care se află un echipament
+                setat=0;
+                System.out.println("Dati numele echipamentului:");
+                cautareDenumire = scanner.nextLine();
+                System.out.println("Dati noua stare a echipamentului:");
+                String cautareStareS =scanner.nextLine();
+                Situatie situatieNoua =  Situatie.valueOf(cautareStareS);
+                for(Echipament ec:lista_echipamente){
+                    if (ec.getDenumire().equals(cautareDenumire))
+                    {
+                        ec.setSituatie(situatieNoua);
+                        setat=1;
+                    }
+
+                }
+                if(setat==0)
+                    System.out.println("Nu s-a gasit un ehipament cu ascest nume!");
+                break;
+            case 6://Setarea unui anumit mod de scriere pentru o imprimantă
+                setat=0;
+                System.out.println("Dati numele imprimantei:");
+                cautareDenumire = scanner.nextLine();
+                System.out.println("Dati noul mod de tiparire  a echimprimantei:");
+                String cautareTiparireS=scanner.nextLine();
+                Mod_tiparire tiparireNoua =  Mod_tiparire.valueOf(cautareTiparireS);
+                for(Echipament ec:lista_echipamente){
+                    if (ec instanceof Imprimante)
+                        if (ec.getDenumire().equals(cautareDenumire))
+                        {
+                            ((Imprimante) ec).setModTiparire(tiparireNoua);
+                            setat=1;
+                        }
+
+
+                }
+                if(setat==0)
+                    System.out.println("Nu s-a gasit o imprimanta cu ascest nume!");
+
 
                 break;
-            case 4:
+            case 7: //Setarea unui format de copiere pentru copiatoare
+                setat=0;
+                System.out.println("Dati numele copiatorului:");
+                cautareDenumire = scanner.nextLine();
+                System.out.println("Dati noul format de copiere:");
+                String cautareFormatCopiereS=scanner.nextLine();
+                Format_copiere formatCopiereNoua = Format_copiere.valueOf(cautareFormatCopiereS);
+                for(Echipament ec:lista_echipamente){
+                    if (ec instanceof Copiatoare)
+                        if (ec.getDenumire().equals(cautareDenumire))
+                        {
+                            ((Copiatoare) ec).setFormat_copiere(formatCopiereNoua);
+                            setat=1;
+                        }
+
+
+                }
+                if(setat==0)
+                    System.out.println("Nu s-a gasit un copiator cu ascest nume!");
                 break;
-            case 5:
+            case 8: //Instalarea unui anumit sistem de operare pe un sistem de calcul
+
+                setat=0;
+                System.out.println("Dati numele sistemului de calcul:");
+                cautareDenumire = scanner.nextLine();
+                System.out.println("Dati noul sistemului de operare:");
+                String cautareSistemOperare=scanner.nextLine();
+                Sisteme_de_operare SistemOperareNou = Sisteme_de_operare.valueOf(cautareSistemOperare);
+                for(Echipament ec:lista_echipamente){
+                    if (ec instanceof Sisteme_de_calcul)
+                        if (ec.getDenumire().equals(cautareDenumire))
+                        {
+                            ((Sisteme_de_calcul) ec).setSistemOperare(SistemOperareNou);
+                            setat=1;
+                        }
+
+                }
+                if(setat==0)
+                    System.out.println("Nu s-a gasit un copiator cu ascest nume!");
                 break;
-            case 6:
-                break;
-            case 7:
-                break;
-            case 8:
-                break;
-            case 9:
+            case 9://Afişarea echipamentelor vândute
+
+
                 break;
             case 10:
                 break;
