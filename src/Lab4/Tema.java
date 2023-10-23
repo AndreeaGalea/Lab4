@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.io.*;
+import java.io.Serializable;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 
 
 enum Situatie{
@@ -14,17 +18,18 @@ enum Situatie{
 }
 enum Mod_tiparire{
     alb,
-    negru
+    negru,
+    color
 }
 enum Format_copiere{
     A3,
     A4
 }
 enum Sisteme_de_operare{
-    Windows,
-    Linux
+    windows,
+    linux
 }
-class Echipament{
+class Echipament implements Serializable{
     private String denumire;
     private String nr_inv;// număr de inventar
     private float pret;
@@ -103,11 +108,11 @@ class Copiatoare extends Echipament{
 class Sisteme_de_calcul extends Echipament{
 
     private String tip_mon;
-    private int vit_proc;   //viteza procesorului
+    private float vit_proc;   //viteza procesorului
     private int c_hdd;  //apacitate a HDD
     private Sisteme_de_operare so; //sistem de operare Windows sau Linux
 
-    Sisteme_de_calcul(String denumire, String nr_inv, float pret, String zona_mag, Situatie situatie, String tip_mon, int vit_proc, int c_hdd, Sisteme_de_operare so){
+    Sisteme_de_calcul(String denumire, String nr_inv, float pret, String zona_mag, Situatie situatie, String tip_mon, float vit_proc, int c_hdd, Sisteme_de_operare so){
         super(denumire, nr_inv, pret, zona_mag, situatie);
         this.tip_mon=tip_mon;
         this.vit_proc=vit_proc;
@@ -134,15 +139,16 @@ public class Tema {
             String[] splited = linie.split(";");
             switch (splited[5].toLowerCase()){
                 case "imprimanta":
+                                                //denumire            //nr inv      pret float                //zona       //situatie                                   //ppm                //rezolut
                     lista_echipamente.add(new Imprimante(splited[0], splited[1], Float.parseFloat(splited[2]),splited[3],Situatie.valueOf(splited[4].toLowerCase()), splited[6], Integer.parseInt(splited[7]), Integer.parseInt(splited[8]),Mod_tiparire.valueOf(splited[9].toLowerCase()) ));
                     break;
 
                 case "copiator":
-                    lista_echipamente.add(new Copiatoare(splited[0], splited[1], Float.parseFloat(splited[2]),splited[3],Situatie.valueOf(splited[4].toLowerCase()),Integer.parseInt(splited[6]), Format_copiere.valueOf(splited[7].toLowerCase())));
+                    lista_echipamente.add(new Copiatoare(splited[0], splited[1], Float.parseFloat(splited[2]),splited[3],Situatie.valueOf(splited[4].toLowerCase()),Integer.parseInt(splited[6]), Format_copiere.valueOf(splited[7])));
                     break;
 
                 case "sistem de calcul":
-                    lista_echipamente.add(new Sisteme_de_calcul(splited[0], splited[1], Float.parseFloat(splited[2]),splited[3],Situatie.valueOf(splited[4].toLowerCase()),splited[6], Integer.parseInt(splited[7]), Integer.parseInt(splited[8]), Sisteme_de_operare.valueOf(splited[9])));
+                    lista_echipamente.add(new Sisteme_de_calcul(splited[0], splited[1], Float.parseFloat(splited[2]),splited[3],Situatie.valueOf(splited[4].toLowerCase()),splited[6], Float.parseFloat(splited[7]), Integer.parseInt(splited[8]), Sisteme_de_operare.valueOf(splited[9])));
                     break;
             }
 
@@ -163,6 +169,7 @@ public class Tema {
         System.out.println("10 -serializarea colecției de obiecte în fișierul echip.bin ");
         System.out.println("11 -deserializarea colecției de obiecte în fișierul echip.bin ");
         Scanner scanner=new Scanner(System.in);
+
         int optiune = Integer.parseInt(scanner.nextLine());
         switch (optiune) {
             case 1: //Afişarea tuturor echipamentelor
@@ -267,13 +274,25 @@ public class Tema {
 
                 }
                 if(setat==0)
-                    System.out.println("Nu s-a gasit un copiator cu ascest nume!");
+                    System.out.println("Nu s-a gasit un sisteme de calcul cu ascest nume!");
                 break;
             case 9://Afişarea echipamentelor vândute
 
+                for(Echipament ec:lista_echipamente){
+                    if(ec.getSituatie().toString().equals("vandut"))
 
+                         System.out.println(ec);
+                }
                 break;
-            case 10:
+            case 10://erializarea colecției de obiecte în fișierul echip.bin
+
+                FileOutputStream fos = new FileOutputStream("echip.bin");
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+                for(Echipament ec:lista_echipamente){
+                    oos.writeObject(ec);
+                }
+                oos.close();
+                fos.close();
                 break;
             case 11:
                 break;
